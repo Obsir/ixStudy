@@ -17,5 +17,10 @@ from django.conf.urls import url
 from app01 import views
 
 urlpatterns = [
-    url(r'^login/$', views.login),
+    url(r'^login/$', views.login, name='login'),
+    url(r'^logout/$', views.logout, name='logout'),
+    url(r'^index/$', views.index, name='index'),
+    url(r'^register/$', views.register, name='register'),
+    url(r'^article/(\d+)$', views.article, name='article'),
+    url(r'^backend/$', views.backend, name='backend'),
 ]

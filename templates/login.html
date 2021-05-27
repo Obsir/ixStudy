@@ -1,10 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
+<html lang="zh-CN">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>登陆丨IxStudy</title>
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 <body>
 
+<div class="login-container">
+	<h1>IxStudy知识学习平台</h1>
+
+	<div class="connect">
+		<p>欢迎登陆</p>
+	</div>
+
+	<form action="" method="post" id="loginForm">
+        {% csrf_token %}
+		<div>
+			<input type="text" name="username" class="username" placeholder="用户名" autocomplete="off"/>
+		</div>
+		<div>
+			<input type="password" name="password" class="password" placeholder="密码" oncontextmenu="return false" onpaste="return false" />
+		</div>
+        <div>{{ error }}</div>
+		<button id="submit" type="submit">登 陆</button>
+	</form>
+
+	<a href={% url 'register' %}>
+		<button type="button" class="register-tis">还有没有账号？</button>
+	</a>
+
+</div>
+
 </body>
+
+<!-- 引入jquery库，如果页面已经有其他版本的也行，不要重复引用 -->
+<script src="https://www.jq22.com/jquery/1.11.1/jquery.min.js"></script>
+<!--自动更换背景图片用的一个插件-->
+<script src="{% static 'js/supersized.js' %}"></script>
+<!--表单验证的插件-->
+<script src="{% static 'js/jquery.js' %}"></script>
+
+<!-- 上面三个js不要改，下面才是我们自定义的 -->
+<script src="{% static 'js/common.js' %}"></script>
+<!-- 背景图片更换配置 -->
+<script src="{% static 'js/supersized-init.js' %}"></script>
 </html>
