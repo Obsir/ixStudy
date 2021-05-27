@@ -22,5 +22,8 @@ urlpatterns = [
     url(r'^index/$', views.index, name='index'),
     url(r'^register/$', views.register, name='register'),
     url(r'^article/(\d+)$', views.article, name='article'),
+    url(r'^article_edit/(\d+)$', views.article_edit, name='article_edit'),
     url(r'^backend/$', views.backend, name='backend'),
+    url(r'^article_list/$', views.article_list, name='article_list'),
+    url(r'^article_add/$', views.article_add, name='article_add'),
 ]

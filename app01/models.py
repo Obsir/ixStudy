@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.safestring import mark_safe
 
 
 # Create your models here.
@@ -13,6 +14,7 @@ class User(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='注册时间')
     # 用户是否注销
     is_activate = models.BooleanField(default=True)
+
     # auto_now无论是你添加还是修改对象，时间为你添加或者修改的时间。
     # auto_now_add为添加时的时间，更新对象时不会有变动。
 
@@ -25,6 +27,9 @@ class Category(models.Model):
     标题
     """
     title = models.CharField(max_length=64, verbose_name="板块标题")
+
+    def __str__(self):
+        return self.title
 
 
 class Article(models.Model):
@@ -45,8 +50,16 @@ class Article(models.Model):
     category = models.ForeignKey('Category', verbose_name="板块", on_delete=models.DO_NOTHING, null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     update_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
-    delete_status = models.BooleanField(default=False, verbose_name="注销状态")
+    publish_status = models.BooleanField(default=False, choices=((False, '未发布'), (True, '发布')), verbose_name="发布状态")
     detail = models.OneToOneField('ArticleDetail', on_delete=models.DO_NOTHING)
+
+    def show_publish_status(self):
+        color_dict = {
+            True: 'label-primary',
+            False: 'label-danger'
+        }
+        return mark_safe('<span class="label {}">{}</span>'.format(color_dict[self.publish_status],
+            self.get_publish_status_display()))
 
 
 class ArticleDetail(models.Model):

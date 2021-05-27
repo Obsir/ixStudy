@@ -1,81 +1,41 @@
 from django.shortcuts import render, redirect
 from app01 import models
-from django import forms
-from django.core.exceptions import ValidationError
-import re
+from app01.forms import RegForm, ArticleForm
 import hashlib
 
 
-class RegForm(forms.ModelForm):
+# 展示文章列表
+def article_list(request):
+    all_articles = models.Article.objects.all()
+    return render(request, 'article_list.html', {'all_articles': all_articles})
 
-    def __init__(self, *args, **kwargs):
-        super(RegForm, self).__init__(*args, **kwargs)
-        # 自定义操作
-        self.fields['company'].choices[0] = ('', '选择公司')
-        self.fields['company'].choices = self.fields['company'].choices  # 迷惑操作？
 
-    re_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "confirm_password",
-                                          "placeholder": "再次输入密码",
-                                          "oncontextmenu": "return false",
-                                          "onpaste": "return false"}),
-        label='确认密码', min_length=6)
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "password",
-                                          "placeholder": "输入密码",
-                                          "oncontextmenu": "return false",
-                                          "onpaste": "return false"}),
-        error_messages={'required': '必填项'}, label='密码', min_length=6)
+# 新增文章
+def article_add(request):
+    form_obj = ArticleForm()
+    if request.method == 'POST':
+        form_obj = ArticleForm(request.POST)
+        if form_obj.is_valid():
+            detail = request.POST.get("detail")
+            detail_obj = models.ArticleDetail.objects.create(content=detail)
+            form_obj.instance.detail_id = detail_obj.pk
+            form_obj.save()
 
-    class Meta:
-        model = models.User
-        # fields = ['username', 'password', ]
-        fields = '__all__'
-        exclude = ['last_time']
-        # labels = {
-        #     'username': '用户名'
-        # }
-        widgets = {
-            'username': forms.TextInput(attrs={
-                "class": "username",
-                "placeholder": "您的用户名",
-                "autocomplete": "off"
-            }),
-            'position': forms.TextInput(attrs={
-                "placeholder": "请输入职位",
-                "autocomplete": "off"
-            }),
-            'phone': forms.TextInput(attrs={
-                "placeholder": "请输入手机号码",
-            }),
-        }
-        error_messages = {
-            'username': {
-                'required': '必填项'
-            },
-            'password': {
-                'required': '必填项'
-            }
-        }
+            return redirect('article_list')
+    return render(request, 'article_add.html', {'form_obj': form_obj})
 
-    def clean_phone(self):
-        phone = self.cleaned_data.get('phone')
-        if re.match(r'^1[3-9]\d{9}$', phone):
-            return phone
-        raise ValidationError('手机号格式不正确')
 
-    def clean(self):
-        self._validate_unique = True
-        password = self.cleaned_data.get('password', '')
-        re_password = self.cleaned_data.get('re_password')
-
-        if password == re_password:
-            md5 = hashlib.md5()
-            md5.update(password.encode('utf-8'))
-            self.cleaned_data['password'] = md5.hexdigest()
-            return self.cleaned_data
-        self.add_error('re_password', '两次密码不一致')
-        raise ValidationError('两次密码不一致')
+# 编辑文章
+def article_edit(request, pk):
+    article_obj = models.Article.objects.filter(pk=pk).first()
+    form_obj = ArticleForm(instance=article_obj)
+    if request.method == "POST":
+        form_obj = ArticleForm(request.POST, instance=article_obj)
+        if form_obj.is_valid():
+            form_obj.instance.detail.content = request.POST.get("detail")
+            form_obj.instance.detail.save()
+            form_obj.save()
+    return render(request, 'article_edit.html', {'form_obj': form_obj, 'article_obj': article_obj})
 
 
 # Create your views here.
