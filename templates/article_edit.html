@@ -1,5 +1,6 @@
 {% extends 'dashboard.html' %}
 
+
 {% block main %}
     <h1>编辑文章</h1>
     <form class="form-horizontal" method="post" action="" novalidate>
@@ -8,7 +9,7 @@
             <div class="form-group{% if field.errors %} has-error {% endif %}">
                 <label for="{{ field.id_for_label }}"
                        class="col-sm-2 control-label">{{ field.label }}</label>
-                <div class="col-sm-8">
+                <div class="col-sm-7">
                     {{ field }} <span class="help-block">{{ field.errors.0 }}</span>
                 </div>
             </div>
@@ -17,7 +18,8 @@
             <label for="detail"
                    class="col-sm-2 control-label">{{ field.label }}</label>
             <div class="col-sm-8">
-                <textarea class="form-control" rows="3" id="detail" name="detail">{{ article_obj.detail.content }}</textarea>
+                {{ article_detail_form_obj.content }}
+                {#                <textarea class="form-control" rows="3" id="detail" name="detail">{{ article_obj.detail.content }}</textarea>#}
             </div>
         </div>
         <div class="form-group">
@@ -28,4 +30,20 @@
 
 
     </form>
+{% endblock %}
+
+
+{% block css %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'plugins/prism/prism.css' %}">
+{% endblock %}
+
+{% block js %}
+    {% load static %}
+    {#    <script>#}
+    {#    $(".django-ckeditor-widget").removeAttr('style');#}
+    {#    </script>#}
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/prism/prism.js' %}"></script>
 {% endblock %}

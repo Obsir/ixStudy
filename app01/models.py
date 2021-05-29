@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.safestring import mark_safe
-
+from ckeditor_uploader.fields import RichTextUploadingField
 
 # Create your models here.
 class User(models.Model):
@@ -14,6 +14,7 @@ class User(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='注册时间')
     # 用户是否注销
     is_activate = models.BooleanField(default=True)
+    avatar = models.ImageField(upload_to='img/avatar', default='img/avatar/default.jpg')
 
     # auto_now无论是你添加还是修改对象，时间为你添加或者修改的时间。
     # auto_now_add为添加时的时间，更新对象时不会有变动。
@@ -66,7 +67,7 @@ class ArticleDetail(models.Model):
     """
     文章详情表
     """
-    content = models.TextField(verbose_name="文章内容")
+    content = RichTextUploadingField(verbose_name="文章内容")
 
 
 class Comment(models.Model):

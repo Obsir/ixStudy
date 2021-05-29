@@ -1,41 +1,53 @@
 from django.shortcuts import render, redirect
 from app01 import models
-from app01.forms import RegForm, ArticleForm
+from app01.forms import RegForm, ArticleForm, ArticleDetailForm
 import hashlib
+from utils.pagination import Pagination
 
 
 # 展示文章列表
 def article_list(request):
-    all_articles = models.Article.objects.all()
-    return render(request, 'article_list.html', {'all_articles': all_articles})
+    # all_articles = models.Article.objects.all()
+    all_articles = models.Article.objects.filter(author=request.user_obj)
+    page = Pagination(request, all_articles.count())
+    return render(request, 'article_list.html', {'all_articles': all_articles[page.start: page.end], 'page_html': page.page_html})
 
 
 # 新增文章
 def article_add(request):
-    form_obj = ArticleForm()
+    article_obj = models.Article(author=request.user_obj)
+    form_obj = ArticleForm(instance=article_obj)
+    article_detail_form_obj = ArticleDetailForm()
     if request.method == 'POST':
-        form_obj = ArticleForm(request.POST)
-        if form_obj.is_valid():
-            detail = request.POST.get("detail")
-            detail_obj = models.ArticleDetail.objects.create(content=detail)
+        form_obj = ArticleForm(request.POST, instance=article_obj)
+        article_detail_form_obj = ArticleDetailForm(request.POST)
+        if form_obj.is_valid() and article_detail_form_obj.is_valid():
+            # detail = request.POST.get("detail")
+            # detail_obj = models.ArticleDetail.objects.create(content=detail)
+            detail_obj = article_detail_form_obj.save()
             form_obj.instance.detail_id = detail_obj.pk
             form_obj.save()
 
             return redirect('article_list')
-    return render(request, 'article_add.html', {'form_obj': form_obj})
+    return render(request, 'article_add.html',
+                  {'form_obj': form_obj, 'article_detail_form_obj': article_detail_form_obj})
 
 
 # 编辑文章
 def article_edit(request, pk):
     article_obj = models.Article.objects.filter(pk=pk).first()
     form_obj = ArticleForm(instance=article_obj)
+    article_detail_form_obj = ArticleDetailForm(instance=article_obj.detail)
     if request.method == "POST":
         form_obj = ArticleForm(request.POST, instance=article_obj)
-        if form_obj.is_valid():
-            form_obj.instance.detail.content = request.POST.get("detail")
-            form_obj.instance.detail.save()
+        article_detail_form_obj = ArticleDetailForm(request.POST, instance=article_obj.detail)
+        if form_obj.is_valid() and article_detail_form_obj.is_valid():
+            # form_obj.instance.detail.content = request.POST.get("detail")
+            # form_obj.instance.detail.save()
+            article_detail_form_obj.save()
             form_obj.save()
-    return render(request, 'article_edit.html', {'form_obj': form_obj, 'article_obj': article_obj})
+    return render(request, 'article_edit.html',
+                  {'form_obj': form_obj, 'article_detail_form_obj': article_detail_form_obj})
 
 
 # Create your views here.
@@ -46,12 +58,13 @@ def login(request):
         # 加密
         md5 = hashlib.md5()
         md5.update(password.encode('utf-8'))
-        user_obj = models.User.objects.filter(username=username, password=md5.hexdigest(), is_activate=True).first()
+        user_obj = models.User.objects.filter(username=username, password=md5.hexdigest()).first()
         if user_obj:
             # 登陆成功
             # 保存登录状态 用户名
             request.session['is_login'] = True
             request.session['username'] = user_obj.username
+            request.session['pk'] = user_obj.pk
 
             url = request.GET.get('url')
             if url:
@@ -69,9 +82,11 @@ def logout(request):
 def index(request):
     # 查询所有文章
     all_articles = models.Article.objects.all()
-    is_login = request.session.get('is_login')
-    username = request.session.get('username')
-    return render(request, 'index.html', {'all_articles': all_articles})
+    # is_login = request.session.get('is_login')
+    # username = request.session.get('username')
+    # user_obj = models.User.objects.filter(pk=request.session.get('pk')).first()
+    page = Pagination(request, all_articles.count(), clazz="pagination", per_num=5)
+    return render(request, 'index.html', {'all_articles': all_articles[page.start: page.end], 'page_html': page.page_html})
 
 
 def article(request, pk):
@@ -86,12 +101,20 @@ def backend(request):
 def register(request):
     form_obj = RegForm()
     if request.method == 'POST':
-        form_obj = RegForm(request.POST)
+        form_obj = RegForm(request.POST, request.FILES)
         if form_obj.is_valid():
             # form_obj.cleaned_data.pop('re_password')
             # models.User.objects.create(**form_obj.cleaned_data)
-            instance = form_obj.save(commit=False)
-            instance.is_activate = True
-            instance.save()
+            form_obj.save()
             return redirect('login')
     return render(request, 'register.html', {'form_obj': form_obj})
+
+
+users = [{"name": 'Obser-{}'.format(i), 'password': '123'} for i in range(1, 446)]
+
+
+
+def user_list(request):
+    page = Pagination(request, len(users))
+    return render(request, 'user_list.html',
+                  {'users': users[page.start: page.end], 'page_html': page.page_html})

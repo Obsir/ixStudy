@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="canonical" href="https://getbootstrap.com/docs/3.4/examples/blog/">
 
-    <title>Blog Template for Bootstrap</title>
+    <title>IxStudy</title>
 
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.8/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -17,6 +17,9 @@
     <!-- Custom styles for this template -->
     {% load static %}
     <link href="{% static 'css/blog.css' %}" rel="stylesheet">
+    <script src="{% static 'ckeditor/ckeditor/plugins/prism/lib/prism/prism_patched.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'plugins/prism/prism.css' %}">
+    <script type="text/javascript" src="{% static 'plugins/prism/prism.js' %}"></script>
 
 
 </head>
@@ -29,9 +32,9 @@
 
     <div class="blog-header">
         <h1 class="blog-title">{{ article_obj.title }}</h1>
-        <p class="lead blog-description">{{ article_obj.detail.content }}</p>
-    </div>
+        <p class="lead blog-description">{{ article_obj.detail.content | safe }}</p>
 
+    </div>
 
 </div><!-- /.container -->
 
@@ -50,7 +53,9 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
         integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"
         crossorigin="anonymous"></script>
-<script>window.jQuery || document.write('<script src="https://cdn.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.8/assets/js/vendor/jquery.min.js"><\/script>')</script>
 <script src="https://cdn.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.8/dist/js/bootstrap.min.js"></script>
+
+<script>window.jQuery || document.write('<script src="https://cdn.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.8/assets/js/vendor/jquery.min.js"><\/script>')</script>
+
 </body>
 </html>

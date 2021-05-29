@@ -8,40 +8,50 @@
 
 <body>
 
-	<div class="register-container">
-		<h1>IxStudy知识学习平台</h1>
+<div class="register-container">
+    <h1>IxStudy知识学习平台</h1>
 
-		<div class="connect">
-			<p>欢迎注册</p>
-		</div>
+    <div class="connect">
+        <p>欢迎注册</p>
+    </div>
 
-		<form action="" method="post" id="registerForm">
-            {% csrf_token %}
-            <div>
-                {{ form_obj.username }}
-            </div>
-            <div>
-                {{ form_obj.password }}
-            </div>
-            <div>
-                {{ form_obj.re_password }}
-            </div>
-            <div>
-                {{ form_obj.position }}
-            </div>
-            <div>
-                {{ form_obj.company }}
-            </div>
-            <div>
-                {{ form_obj.phone }}
-            </div>
-			<button id="submit" type="submit">注 册</button>
-		</form>
-		<a href="{% url 'login' %}">
-			<button type="button" class="register-tis">已经有账号？</button>
-		</a>
+    <form action="" method="post" id="registerForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+            {{ form_obj.username }}
+            <span>{{ form_obj.username.errors.0 }}</span>
+        </div>
+        <div>
+            {{ form_obj.password }}
+            <span>{{ form_obj.password.errors.0 }}</span>
+        </div>
+        <div>
+            {{ form_obj.re_password }}
+            <span>{{ form_obj.re_password.errors.0 }}</span>
+        </div>
+        <div>
+            {{ form_obj.position }}
+            <span>{{ form_obj.position.errors.0 }}</span>
+        </div>
+        <div>
+            {{ form_obj.company }}
+            <span>{{ form_obj.company.errors.0 }}</span>
+        </div>
+        <div>
+            {{ form_obj.phone }}
+            <span>{{ form_obj.phone.errors.0 }}</span>
+        </div>
+        <div>
+            {{ form_obj.avatar }}
+            <span>{{ form_obj.avatar.errors.0 }}</span>
+        </div>
+        <button id="submit" type="submit">注 册</button>
+    </form>
+    <a href="{% url 'login' %}">
+        <button type="button" class="register-tis">已经有账号？</button>
+    </a>
 
-	</div>
+</div>
 
 </body>
 <!-- 引入jquery库，如果页面已经有其他版本的也行，不要重复引用 -->

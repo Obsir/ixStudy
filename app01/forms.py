@@ -5,18 +5,42 @@ from app01 import models
 import hashlib
 
 
+class ArticleDetailForm(forms.ModelForm):
+    class Meta:
+        model = models.ArticleDetail
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 自定义操作
+
+
+
+
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = models.Article
         fields = "__all__"
         exclude = ['detail']
 
+    # def __init__(self, request, *args, **kwargs):
+    #     # 获取到用户传来的request参数，不要往父类传递
+    #     super().__init__(*args, **kwargs)
+    #     # 自定义操作
+    #     for field in self.fields.values():
+    #         field.widget.attrs["class"] = "form-control"
+    #
+    #     # 修改choices的参数
+    #     self.fields['author'].choices = [(request.user_obj.pk, request.user_obj.username)]
     def __init__(self, *args, **kwargs):
+        # 获取到用户传来的request参数，不要往父类传递
         super().__init__(*args, **kwargs)
         # 自定义操作
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
 
+        # 修改choices的参数
+        self.fields['author'].choices = [(self.instance.author.pk, self.instance.author.username)]
 
 
 class RegForm(forms.ModelForm):
@@ -44,7 +68,7 @@ class RegForm(forms.ModelForm):
         model = models.User
         # fields = ['username', 'password', ]
         fields = '__all__'
-        exclude = ['last_time']
+        exclude = ['last_time', 'is_activate']
         # labels = {
         #     'username': '用户名'
         # }
