@@ -1,8 +1,18 @@
 from django.db import models
 from django.utils.safestring import mark_safe
 from ckeditor_uploader.fields import RichTextUploadingField
+import os, uuid
+from imagekit.models import ProcessedImageField
+
 
 # Create your models here.
+def user_directory_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = '{}.{}'.format(uuid.uuid4().hex[:10], ext)
+    # 这里的id是User表的id
+    return os.path.join('user', instance.username, "avatar", filename)
+
+
 class User(models.Model):
     username = models.CharField(max_length=32, verbose_name='用户名', unique=True)
     password = models.CharField(max_length=32, verbose_name='密码')
@@ -14,7 +24,8 @@ class User(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='注册时间')
     # 用户是否注销
     is_activate = models.BooleanField(default=True)
-    avatar = models.ImageField(upload_to='img/avatar', default='img/avatar/default.jpg')
+    avatar = ProcessedImageField(upload_to=user_directory_path, default='img/avatar/default.jpg', verbose_name='头像',
+                                 format='JPEG', options={'quality': 100})
 
     # auto_now无论是你添加还是修改对象，时间为你添加或者修改的时间。
     # auto_now_add为添加时的时间，更新对象时不会有变动。
@@ -60,7 +71,7 @@ class Article(models.Model):
             False: 'label-danger'
         }
         return mark_safe('<span class="label {}">{}</span>'.format(color_dict[self.publish_status],
-            self.get_publish_status_display()))
+                                                                   self.get_publish_status_display()))
 
 
 class ArticleDetail(models.Model):

@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app01.apps.App01Config',
     'ckeditor',
-    'ckeditor_uploader'
+    'ckeditor_uploader',
+    'imagekit'
 ]
 
 MIDDLEWARE = [

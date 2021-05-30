@@ -11,7 +11,7 @@ def article_list(request):
     all_articles = models.Article.objects.filter(author=request.user_obj)
     page = Pagination(request, all_articles.count())
     return render(request, 'article_list.html',
-                  {'all_articles': all_articles[page.start: page.end], 'page_html': page.page_html})
+                  {'all_articles': all_articles[page.start: page.end] if all_articles else None, 'page_html': page.page_html})
 
 
 # 新增文章

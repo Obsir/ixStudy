@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 import re
 from app01 import models
 import hashlib
+from PIL import Image
 
 
 class BootStrapForm(forms.ModelForm):
@@ -31,7 +32,6 @@ class CategoryForm(BootStrapForm):
     class Meta:
         model = models.Category
         fields = '__all__'
-
 
 
 class ArticleForm(BootStrapForm):
@@ -63,6 +63,11 @@ class RegForm(forms.ModelForm):
         # 自定义操作
         self.fields['company'].choices[0] = ('', '选择公司')
         self.fields['company'].choices = self.fields['company'].choices  # 迷惑操作？
+
+    x = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    y = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    width = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    height = forms.FloatField(widget=forms.HiddenInput(), required=False)
 
     re_password = forms.CharField(
         widget=forms.PasswordInput(attrs={"class": "confirm_password",
@@ -118,7 +123,6 @@ class RegForm(forms.ModelForm):
         self._validate_unique = True
         password = self.cleaned_data.get('password', '')
         re_password = self.cleaned_data.get('re_password')
-
         if password == re_password:
             md5 = hashlib.md5()
             md5.update(password.encode('utf-8'))
@@ -126,3 +130,18 @@ class RegForm(forms.ModelForm):
             return self.cleaned_data
         self.add_error('re_password', '两次密码不一致')
         raise ValidationError('两次密码不一致')
+
+    def save(self, commit=True):
+        user = super(RegForm, self).save(commit=False)
+        user.save()
+
+        x = self.cleaned_data.get('x')
+        y = self.cleaned_data.get('y')
+        w = self.cleaned_data.get('width')
+        h = self.cleaned_data.get('height')
+        if x:
+            avatar = Image.open(user.avatar)
+            avatar = avatar.crop((x, y, w + x, h + y))
+            avatar.save(user.avatar.path)
+
+        return user

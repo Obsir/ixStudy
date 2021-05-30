@@ -1,11 +1,13 @@
 <style type="text/css">
-    .circle{
-        width:25px;
-        height:25px;
-        border-radius:25px;
+    .circle {
+        width: 25px;
+        height: 25px;
+        border-radius: 25px;
         margin-right: 10px;
     }
 </style>
+{% load static %}
+<link href="{% static 'plugins/dashboard/css/animate.css' %}" rel="stylesheet">
 <div class="blog-masthead">
     <div class="container">
         <nav class="blog-nav">
@@ -14,15 +16,15 @@
             <a class="blog-nav-item" href="#">Press</a>
             <a class="blog-nav-item" href="#">New hires</a>
             <a class="blog-nav-item" href="#">About</a>
+
             {% if request.session.is_login %}
                 <div class="btn-group pull-right">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                        <img class="circle" width="20px" src="{{ request.user_obj.avatar.url }}">
-                        {{ request.session.username }} <span class="caret"></span>
+                    <button type="button" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false" style="background: none;border: none;">
+                        <img class="img-circle" width="30px" style="margin-top: 3px" src="{{ request.user_obj.avatar.url }}">
                     </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="{% url 'backend' %}">管理中心</a></li>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li><a href="{% url 'article_list' %}">管理中心</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="{% url 'logout' %}">注销</a></li>
                     </ul>
@@ -31,5 +33,7 @@
                 <a class="blog-nav-item pull-right" href="{% url 'login' %}?url={{ request.path_info }}">登录</a>
             {% endif %}
         </nav>
+
     </div>
 </div>
+
