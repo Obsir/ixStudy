@@ -1,4 +1,7 @@
 {% extends 'dashboard.html' %}
+{% block article_active %}
+active
+{% endblock %}
 {% block main %}
     <h1>文章列表</h1>
     <a class="btn btn-primary btn-sm" href="{% url 'article_add' %}"><i class="fa fa-plus"></i></a>

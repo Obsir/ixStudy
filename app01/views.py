@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from app01 import models
-from app01.forms import RegForm, ArticleForm, ArticleDetailForm
+from app01.forms import RegForm, ArticleForm, ArticleDetailForm, CategoryForm
 import hashlib
 from utils.pagination import Pagination
 
@@ -10,7 +10,8 @@ def article_list(request):
     # all_articles = models.Article.objects.all()
     all_articles = models.Article.objects.filter(author=request.user_obj)
     page = Pagination(request, all_articles.count())
-    return render(request, 'article_list.html', {'all_articles': all_articles[page.start: page.end], 'page_html': page.page_html})
+    return render(request, 'article_list.html',
+                  {'all_articles': all_articles[page.start: page.end], 'page_html': page.page_html})
 
 
 # 新增文章
@@ -46,6 +47,7 @@ def article_edit(request, pk):
             # form_obj.instance.detail.save()
             article_detail_form_obj.save()
             form_obj.save()
+            return redirect('article_list')
     return render(request, 'article_edit.html',
                   {'form_obj': form_obj, 'article_detail_form_obj': article_detail_form_obj})
 
@@ -86,7 +88,8 @@ def index(request):
     # username = request.session.get('username')
     # user_obj = models.User.objects.filter(pk=request.session.get('pk')).first()
     page = Pagination(request, all_articles.count(), clazz="pagination", per_num=5)
-    return render(request, 'index.html', {'all_articles': all_articles[page.start: page.end], 'page_html': page.page_html})
+    return render(request, 'index.html',
+                  {'all_articles': all_articles[page.start: page.end], 'page_html': page.page_html})
 
 
 def article(request, pk):
@@ -110,11 +113,49 @@ def register(request):
     return render(request, 'register.html', {'form_obj': form_obj})
 
 
-users = [{"name": 'Obser-{}'.format(i), 'password': '123'} for i in range(1, 446)]
+def category_list(request):
+    all_categories = models.Category.objects.all()
+    page = Pagination(request, all_categories.count())
+    return render(request, 'category_list.html',
+                  {"all_categories": all_categories[page.start: page.end], "page_html": page.page_html})
 
 
+def category_add(request):
+    form_obj = CategoryForm()
+    if request.method == 'POST':
+        form_obj = CategoryForm(request.POST)
+        if form_obj.is_valid():
+            form_obj.save()
+            return redirect('category_list')
+    title = '新增板块'
+    return render(request, 'form.html', {'form_obj': form_obj, 'title': title})
 
-def user_list(request):
-    page = Pagination(request, len(users))
-    return render(request, 'user_list.html',
-                  {'users': users[page.start: page.end], 'page_html': page.page_html})
+
+def category_edit(request, pk):
+    category_obj = models.Category.objects.filter(pk=pk).first()
+    form_obj = CategoryForm(instance=category_obj)
+    if request.method == 'POST':
+        form_obj = CategoryForm(request.POST, instance=category_obj)
+        if form_obj.is_valid():
+            form_obj.save()
+            return redirect('category_list')
+    title = '编辑板块'
+    return render(request, 'form.html', {'form_obj': form_obj, 'title': title})
+
+
+def category_change(request, pk=None):
+    category_obj = models.Category.objects.filter(pk=pk).first()
+    form_obj = CategoryForm(instance=category_obj)
+    if request.method == 'POST':
+        form_obj = CategoryForm(request.POST, instance=category_obj)
+        if form_obj.is_valid():
+            form_obj.save()
+            return redirect('category_list')
+    title = '编辑板块' if pk else '新增分类'
+    return render(request, 'form.html', {'form_obj': form_obj, 'title': title})
+
+# users = [{"name": 'Obser-{}'.format(i), 'password': '123'} for i in range(1, 446)]
+# def user_list(request):
+#     page = Pagination(request, len(users))
+#     return render(request, 'user_list.html',
+#                   {'users': users[page.start: page.end], 'page_html': page.page_html})

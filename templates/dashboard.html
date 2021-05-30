@@ -23,7 +23,7 @@
             <ul class="nav metismenu" id="side-menu">
                 <li class="nav-header">
                     <div class="dropdown profile-element"> <span>
-<img alt="image" class="img-circle" src="{% static 'plugins/dashboard/imgs/profile_small.jpg' %}"/>
+<img alt="image" class="img-circle" width="50px" height="50px" src="{{ request.user_obj.avatar.url }}"/>
 </span>
                         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
 <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">David Williams</strong>
@@ -52,12 +52,12 @@
                 {#                                class="label label-primary pull-right">NEW</span></a></li>#}
                 {#                    </ul>#}
                 {#                </li>#}
-                <li class="active">
+                <li class="{% block article_active %}{% endblock %}">
                     <a href="{% url 'article_list' %}"><i class="fa fa-book"></i> <span class="nav-label">文章管理</span></a>
                 </li>
 
-                <li>
-                    <a href="layouts.html"><i class="fa fa-diamond"></i> <span class="nav-label">Layouts</span></a>
+                <li class="{% block category_active %}{% endblock %}">
+                    <a href="{% url 'category_list' %}"><i class="fa fa-dashboard"></i> <span class="nav-label">板块管理</span></a>
                 </li>
                 {#                <li>#}
                 {#                    <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Graphs</span><span#}

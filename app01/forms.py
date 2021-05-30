@@ -5,6 +5,18 @@ from app01 import models
 import hashlib
 
 
+class BootStrapForm(forms.ModelForm):
+    """
+    bootstrap样式
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 自定义操作
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "form-control"
+
+
 class ArticleDetailForm(forms.ModelForm):
     class Meta:
         model = models.ArticleDetail
@@ -15,9 +27,14 @@ class ArticleDetailForm(forms.ModelForm):
         # 自定义操作
 
 
+class CategoryForm(BootStrapForm):
+    class Meta:
+        model = models.Category
+        fields = '__all__'
 
 
-class ArticleForm(forms.ModelForm):
+
+class ArticleForm(BootStrapForm):
     class Meta:
         model = models.Article
         fields = "__all__"
@@ -35,10 +52,6 @@ class ArticleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         # 获取到用户传来的request参数，不要往父类传递
         super().__init__(*args, **kwargs)
-        # 自定义操作
-        for field in self.fields.values():
-            field.widget.attrs["class"] = "form-control"
-
         # 修改choices的参数
         self.fields['author'].choices = [(self.instance.author.pk, self.instance.author.username)]
 
