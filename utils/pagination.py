@@ -1,3 +1,4 @@
+# 优化分页器url，保留原始get参数
 class Pagination:
     def __init__(self, request, length, per_num=10, max_show=11, clazz='pager'):
         try:
@@ -7,6 +8,7 @@ class Pagination:
         except Exception:
             page = 1
 
+        qd = request.GET.copy()
         # 总页码数
         total_num, more = divmod(length, per_num)
         if more:
@@ -36,23 +38,26 @@ class Pagination:
             page_list.append(
                 '<li class="disabled"><a aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>')
         else:
+            qd['page'] = page - 1
             page_list.append(
-                '<li><a href="?page={}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>'.format(
-                    page - 1))
+                '<li><a href="?{}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>'.format(
+                    qd.urlencode()))
 
         for i in range(page_start, page_end + 1):
+            qd['page'] = i
             if i == page:
-                page_list.append('<li class="active"><a href="?page={}">{}</a></li>'.format(i, i))
+                page_list.append('<li class="active"><a href="?{}">{}</a></li>'.format(qd.urlencode(), i))
             else:
-                page_list.append('<li><a href="?page={}">{}</a></li>'.format(i, i))
+                page_list.append('<li><a href="?{}">{}</a></li>'.format(qd.urlencode(), i))
 
         if page == total_num:
             page_list.append(
                 '<li class="disabled"><a aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>')
         else:
+            qd['page'] = page + 1
             page_list.append(
-                '<li><a href="?page={}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>'.format(
-                    page + 1))
+                '<li><a href="?{}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>'.format(
+                    qd.urlencode()))
         page_list.append('</ul></nav>')
         self.page_html = ''.join(page_list)
         # 切片起始值

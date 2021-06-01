@@ -3,15 +3,30 @@ from app01 import models
 from app01.forms import RegForm, ArticleForm, ArticleDetailForm, CategoryForm
 import hashlib
 from utils.pagination import Pagination
+from django.db.models import Q
+
+
+def get_query(request, field_list):
+    # 传入一个列表 ['title', 'detail__content']
+    # 返回Q对象
+    query = request.GET.get('query', '')
+
+    q = Q()
+    q.connector = 'OR'
+    for field in field_list:
+        q.children.append(Q(('{}__contains'.format(field), query)))
+    return q
 
 
 # 展示文章列表
 def article_list(request):
     # all_articles = models.Article.objects.all()
-    all_articles = models.Article.objects.filter(author=request.user_obj)
+    q = get_query(request, ['title', 'abstract'])
+    all_articles = models.Article.objects.filter(author=request.user_obj).filter(q)
     page = Pagination(request, all_articles.count())
     return render(request, 'article_list.html',
-                  {'all_articles': all_articles[page.start: page.end] if all_articles else None, 'page_html': page.page_html})
+                  {'all_articles': all_articles[page.start: page.end] if all_articles else None,
+                   'page_html': page.page_html})
 
 
 # 新增文章
@@ -114,7 +129,8 @@ def register(request):
 
 
 def category_list(request):
-    all_categories = models.Category.objects.all()
+    q = get_query(request, ['title'])
+    all_categories = models.Category.objects.filter(q)
     page = Pagination(request, all_categories.count())
     return render(request, 'category_list.html',
                   {"all_categories": all_categories[page.start: page.end], "page_html": page.page_html})
