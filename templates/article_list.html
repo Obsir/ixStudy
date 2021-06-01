@@ -28,7 +28,9 @@ active
                 <td>{{ article.category | default:'-' }}</td>
                 <td>{{ article.create_time }}</td>
                 <td>{{ article.show_publish_status }}</td>
-                <td><a href="{% url 'article_edit' article.pk %}"><i class="fa fa-edit"></i></a></td>
+                {% load my_tags %}
+                <td><a href="{% reverse_url request 'article_edit' article.pk %}"><i class="fa fa-edit"></i></a></td>
+{#                <td><a href="{% url 'article_edit' article.pk %}?url={{ request.get_full_path }}"><i class="fa fa-edit"></i></a></td>#}
             </tr>
         {% endfor %}
 

@@ -20,7 +20,9 @@ active
                 <td>{{ forloop.counter }}</td>
                 <td>{{ category.pk }}</td>
                 <td>{{ category.title }}</td>
-                <td><a href="{% url 'category_edit' category.pk %}"><i class="fa fa-edit"></i></a></td>
+                {% load my_tags %}
+{#                <td><a href="{% url 'category_edit' category.pk %}"><i class="fa fa-edit"></i></a></td>#}
+                <td><a href="{% reverse_url request 'category_edit' category.pk %}"><i class="fa fa-edit"></i></a></td>
             </tr>
         {% endfor %}
 

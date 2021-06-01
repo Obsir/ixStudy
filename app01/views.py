@@ -62,6 +62,9 @@ def article_edit(request, pk):
             # form_obj.instance.detail.save()
             article_detail_form_obj.save()
             form_obj.save()
+            url = request.GET.get('url')
+            if url:
+                return redirect(url)
             return redirect('article_list')
     return render(request, 'article_edit.html',
                   {'form_obj': form_obj, 'article_detail_form_obj': article_detail_form_obj})
@@ -154,6 +157,9 @@ def category_edit(request, pk):
         form_obj = CategoryForm(request.POST, instance=category_obj)
         if form_obj.is_valid():
             form_obj.save()
+            url = request.GET.get('url')
+            if url:
+                return redirect(url)
             return redirect('category_list')
     title = '编辑板块'
     return render(request, 'form.html', {'form_obj': form_obj, 'title': title})
@@ -166,6 +172,9 @@ def category_change(request, pk=None):
         form_obj = CategoryForm(request.POST, instance=category_obj)
         if form_obj.is_valid():
             form_obj.save()
+            url = request.GET.get('url')
+            if url:
+                return redirect(url)
             return redirect('category_list')
     title = '编辑板块' if pk else '新增分类'
     return render(request, 'form.html', {'form_obj': form_obj, 'title': title})
