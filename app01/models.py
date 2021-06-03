@@ -90,8 +90,14 @@ class Comment(models.Model):
         评论时间
         审核状态
     """
-    author = models.ForeignKey('User', on_delete=models.DO_NOTHING, verbose_name="评论者")
-    article = models.ForeignKey('Article', on_delete=models.DO_NOTHING, verbose_name="文章")
+    author = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name="评论者")
+    article = models.ForeignKey('Article', on_delete=models.CASCADE, verbose_name="文章")
     content = models.TextField(verbose_name="评论内容")
     time = models.DateTimeField(auto_now_add=True, verbose_name="评论时间")
     status = models.BooleanField(verbose_name="审核状态", default=True)
+
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='sons')  # 楼中楼
+    reply_to = models.ForeignKey('User', blank=True, null=True, on_delete=models.CASCADE, related_name="replies")
+
+    class Meta:
+        ordering = ('-time',)

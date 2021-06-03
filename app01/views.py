@@ -4,8 +4,11 @@ from app01.forms import RegForm, ArticleForm, ArticleDetailForm, CategoryForm
 import hashlib
 from utils.pagination import Pagination
 from django.db.models import Q
+from django.http.response import JsonResponse
+from django.utils import timezone
 
 
+# 模糊搜索
 def get_query(request, field_list):
     # 传入一个列表 ['title', 'detail__content']
     # 返回Q对象
@@ -112,7 +115,8 @@ def index(request):
 
 def article(request, pk):
     article_obj = models.Article.objects.get(pk=pk)
-    return render(request, 'article.html', {'article_obj': article_obj})
+    comment_objs = article_obj.comment_set.filter(parent=None)
+    return render(request, 'article.html', {'article_obj': article_obj, 'comment_objs': comment_objs})
 
 
 def backend(request):
@@ -179,8 +183,19 @@ def category_change(request, pk=None):
     title = '编辑板块' if pk else '新增分类'
     return render(request, 'form.html', {'form_obj': form_obj, 'title': title})
 
+
 # users = [{"name": 'Obser-{}'.format(i), 'password': '123'} for i in range(1, 446)]
 # def user_list(request):
 #     page = Pagination(request, len(users))
 #     return render(request, 'user_list.html',
 #                   {'users': users[page.start: page.end], 'page_html': page.page_html})
+
+def comment(request):
+    del_comment_id = request.POST.get('del_comment_id', None)
+    if del_comment_id:
+        models.Comment.objects.filter(pk=del_comment_id).delete()
+        return JsonResponse({'status': True})
+    comment_obj = models.Comment.objects.create(**request.POST.dict())
+    return JsonResponse(
+        {'status': True, 'time': timezone.localtime(comment_obj.time).strftime('%Y-%m-%d %H:%M:%S'),
+         'comment_id': comment_obj.pk})

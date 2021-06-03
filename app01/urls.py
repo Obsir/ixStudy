@@ -30,4 +30,5 @@ urlpatterns = [
     url(r'^category_list/$', views.category_list, name='category_list'),
     url(r'^category_add/$', views.category_change, name='category_add'),
     url(r'^category_edit/(\d+)$', views.category_change, name='category_edit'),
+    url(r'^comment/$', views.comment, name='comment'),
 ]
