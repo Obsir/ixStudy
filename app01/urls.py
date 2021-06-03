@@ -31,7 +31,9 @@ urlpatterns = [
     url(r'^category_add/$', views.category_change, name='category_add'),
     url(r'^category_edit/(\d+)$', views.category_change, name='category_edit'),
     url(r'^comment/$', views.comment, name='comment'),
+    url(r'^profile/$', views.profile, name='profile'),
     url(r'^series_list/$', views.series_list, name='series_list'),
     url(r'^series_add/$', views.series_change, name='series_add'),
     url(r'^series_edit/(\d+)$', views.series_change, name='series_edit'),
+    url(r'^point/$', views.point, name='point'),
 ]

@@ -3,7 +3,7 @@ from app01 import models
 from app01.forms import RegForm, ArticleForm, ArticleDetailForm, CategoryForm, SeriesForm
 import hashlib
 from utils.pagination import Pagination
-from django.db.models import Q
+from django.db.models import Q, F, Sum
 from django.http.response import JsonResponse
 from django.utils import timezone
 
@@ -104,7 +104,7 @@ def logout(request):
 
 def index(request):
     # 查询所有文章
-    all_articles = models.Article.objects.all()
+    all_articles = models.Article.objects.filter(publish_status=True).order_by('-create_time')
     # is_login = request.session.get('is_login')
     # username = request.session.get('username')
     # user_obj = models.User.objects.filter(pk=request.session.get('pk')).first()
@@ -253,3 +253,26 @@ def series_change(request, pk=None):
             return redirect('series_list')
     title = '编辑系列' if pk else '新增系列'
     return render(request, 'form.html', {'form_obj': form_obj, 'title': title})
+
+def profile(request):
+
+    user_series_all = models.UserSeries.objects.filter(user=request.user_obj)
+
+    return render(request, 'profile.html', {'user_series_all': user_series_all})
+
+def point(request):
+    # 插入得分记录
+    point_obj, created = models.PointDetail.objects.get_or_create(**request.GET.dict())
+    # 更新系列进度
+    # 没得过分才能加分
+    if created:
+        query_set = models.UserSeries.objects.filter(user=request.user_obj, series__in=point_obj.article.series_set.all())
+        # 加积分之前计算每个系列的总积分
+        rets = query_set.values('series_id').annotate(total_points=Sum('series__articles__point'))
+        for ret in rets:
+            models.UserSeries.objects.filter(user=request.user_obj, series_id=ret['series_id']).update(total_points=ret['total_points'])
+
+        # 加积分
+        query_set.update(points=F('points') + point_obj.point, progress=F('points') / F('total_points') * 100)
+        return JsonResponse({'status': True})
+    return JsonResponse({'status': False})

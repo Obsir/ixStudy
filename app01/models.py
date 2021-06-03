@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 from ckeditor_uploader.fields import RichTextUploadingField
 import os, uuid
 from imagekit.models import ProcessedImageField
-
+import datetime
 
 # Create your models here.
 def user_directory_path(instance, filename):
@@ -64,6 +64,8 @@ class Article(models.Model):
     update_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
     publish_status = models.BooleanField(default=False, choices=((False, '未发布'), (True, '发布')), verbose_name="发布状态")
     detail = models.OneToOneField('ArticleDetail', on_delete=models.DO_NOTHING)
+    point = models.IntegerField(default=0, verbose_name="文章积分")
+    duration = models.DurationField(default=datetime.timedelta(), verbose_name="推荐阅读时间")
 
     def show_publish_status(self):
         color_dict = {
@@ -88,12 +90,14 @@ class Series(models.Model):
     """
     title = models.CharField(max_length=32, verbose_name="系列名称")
     articles = models.ManyToManyField('Article', verbose_name='文章')
-    users = models.ManyToManyField('User', verbose_name='用户', through='UserSeries')   # 创建第三张表, 自定义的第三张表
+    users = models.ManyToManyField('User', verbose_name='用户', through='UserSeries', related_name='series')   # 创建第三张表, 自定义的第三张表
 
 
 class UserSeries(models.Model):
     user = models.ForeignKey('User', verbose_name='用户')
     series = models.ForeignKey('Series', verbose_name='系列')
+    points = models.IntegerField(default=0, verbose_name='当前分数')
+    total_points = models.IntegerField(default=0, verbose_name='总分数')
     progress = models.CharField(max_length=32, default='0.00', verbose_name='进度')
 
 
@@ -117,3 +121,12 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-time',)
+
+class PointDetail(models.Model):
+    """
+    积分表：
+    """
+    user = models.ForeignKey('User', verbose_name="用户")
+    article = models.ForeignKey('Article', verbose_name="文章")
+    point = models.IntegerField(default=0)
+    time = models.DateTimeField(auto_now_add=True)

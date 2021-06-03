@@ -317,6 +317,33 @@
 
     })
 </script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script>
+//文章带积分，系列文章，时间到了之后发请求，完成积分的计算
+var user_id = {{ request.user_obj.pk }}
+var article_id = {{ article_obj.pk }}
+var point = {{ article_obj.point }}
+var time = {{ article_obj.duration.total_seconds }}
+
+if (point != 0){
+    setTimeout(function (){
+        $.ajax({
+            url: {% url 'point' %},
+            data: {
+                user_id: user_id,
+                article_id: article_id,
+                point: point
+        },
+            success: function (res){
+                if (res.status){
+                    swal(`恭喜完成阅读！得到${point}积分`);
+                }
+            }
+        })
+    }, time * 1000)
+}
+
+</script>
 
 {% endif %}
 
