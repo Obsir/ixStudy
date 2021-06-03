@@ -20,3 +20,7 @@
 * 注册
 
 ![image-20210531015021077](README.assets/image-20210531015021077.png)
+
+* 评论
+
+![image-20210603160817599](README.assets/image-20210603160817599.png)
