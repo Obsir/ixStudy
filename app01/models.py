@@ -73,12 +73,28 @@ class Article(models.Model):
         return mark_safe('<span class="label {}">{}</span>'.format(color_dict[self.publish_status],
                                                                    self.get_publish_status_display()))
 
+    def __str__(self):
+        return self.title
 
 class ArticleDetail(models.Model):
     """
     文章详情表
     """
     content = RichTextUploadingField(verbose_name="文章内容")
+
+class Series(models.Model):
+    """
+    系列
+    """
+    title = models.CharField(max_length=32, verbose_name="系列名称")
+    articles = models.ManyToManyField('Article', verbose_name='文章')
+    users = models.ManyToManyField('User', verbose_name='用户', through='UserSeries')   # 创建第三张表, 自定义的第三张表
+
+
+class UserSeries(models.Model):
+    user = models.ForeignKey('User', verbose_name='用户')
+    series = models.ForeignKey('Series', verbose_name='系列')
+    progress = models.CharField(max_length=32, default='0.00', verbose_name='进度')
 
 
 class Comment(models.Model):

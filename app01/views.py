@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from app01 import models
-from app01.forms import RegForm, ArticleForm, ArticleDetailForm, CategoryForm
+from app01.forms import RegForm, ArticleForm, ArticleDetailForm, CategoryForm, SeriesForm
 import hashlib
 from utils.pagination import Pagination
 from django.db.models import Q
@@ -199,3 +199,57 @@ def comment(request):
     return JsonResponse(
         {'status': True, 'time': timezone.localtime(comment_obj.time).strftime('%Y-%m-%d %H:%M:%S'),
          'comment_id': comment_obj.pk})
+
+
+def series_list(request):
+    q = get_query(request, ['title'])
+    all_series = models.Series.objects.filter(q)
+    page = Pagination(request, all_series.count())
+    return render(request, 'series_list.html',
+                  {"all_series": all_series[page.start: page.end], "page_html": page.page_html})
+
+def series_change(request, pk=None):
+    series_obj = models.Series.objects.filter(pk=pk).first()
+    form_obj = SeriesForm(instance=series_obj)
+    if request.method == 'POST':
+        form_obj = SeriesForm(request.POST, instance=series_obj)
+        if form_obj.is_valid():
+            # 新增系列对象
+            form_obj.instance.save()
+            series_obj = form_obj.instance
+            # 保存系列和文章的多对多关系
+            series_obj.articles.set(form_obj.cleaned_data.get('articles'))
+            # 保存的系列和用户的多对多关系
+            users = form_obj.cleaned_data.get('users')
+
+            if not pk:
+                # 新增
+                obj_list = []
+                for user in users:
+                    obj_list.append(models.UserSeries(user_id=user.pk, series_id=series_obj.pk))
+                if obj_list:
+                    models.UserSeries.objects.bulk_create(obj_list)  # 批量插入
+            else:
+                # 编辑
+                # 用户没有变更
+                old_users = set(series_obj.users.all())
+                new_users = set(users)
+                # 新添加用户
+                add_users = new_users - old_users
+                if add_users:
+                    obj_list = []
+                    for user in add_users:
+                        obj_list.append(models.UserSeries(user_id=user.pk, series_id=series_obj.pk))
+                    if obj_list:
+                        models.UserSeries.objects.bulk_create(obj_list)  # 批量插入
+                # 删除用户
+                del_users = old_users - new_users
+                if del_users:
+                    models.UserSeries.objects.filter(series_id=series_obj.pk, user_id__in=del_users).delete()
+
+            url = request.GET.get('url')
+            if url:
+                return redirect(url)
+            return redirect('series_list')
+    title = '编辑系列' if pk else '新增系列'
+    return render(request, 'form.html', {'form_obj': form_obj, 'title': title})

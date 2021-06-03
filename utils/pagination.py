@@ -8,6 +8,7 @@ class Pagination:
         except Exception:
             page = 1
 
+
         qd = request.GET.copy()
         # 总页码数
         total_num, more = divmod(length, per_num)
@@ -64,3 +65,6 @@ class Pagination:
         self.start = (page - 1) * per_num
         # 切片终止值
         self.end = page * per_num
+        if length < 1:
+            self.start = 0
+            self.end = 0

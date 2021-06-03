@@ -34,6 +34,11 @@ class CategoryForm(BootStrapForm):
         fields = '__all__'
 
 
+class SeriesForm(BootStrapForm):
+    class Meta:
+        model = models.Series
+        fields = '__all__'
+
 class ArticleForm(BootStrapForm):
     class Meta:
         model = models.Article

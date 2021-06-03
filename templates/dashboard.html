@@ -35,7 +35,7 @@
                         </ul>
                     </div>
                     <div class="logo-element">
-                        IN+
+                        IxS
                     </div>
                 </li>
                 {#                <li>#}
@@ -58,6 +58,11 @@
                 <li class="{% block category_active %}{% endblock %}">
                     <a href="{% url 'category_list' %}"><i class="fa fa-dashboard"></i> <span
                             class="nav-label">板块管理</span></a>
+                </li>
+
+                <li class="{% block series_active %}{% endblock %}">
+                    <a href="{% url 'series_list' %}"><i class="fa fa-tasks"></i> <span
+                            class="nav-label">系列管理</span></a>
                 </li>
                 {#                <li>#}
                 {#                    <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Graphs</span><span#}
